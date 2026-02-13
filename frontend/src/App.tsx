@@ -1,5 +1,5 @@
-import { ProcedureTestsPage } from './pages/ProcedureTestsPage'
+import { SqlUnitTestManager } from './pages/SqlUnitTestManager'
 
 export default function App() {
-  return <ProcedureTestsPage />
+  return <SqlUnitTestManager />
 }

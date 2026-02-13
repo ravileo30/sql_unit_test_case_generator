@@ -1,39 +1,15 @@
 # SQL Unit Test Case Generator
 
-This scaffold matches your requested architecture:
+End-to-end SQL unit testing tool for SQL Server procedures.
 
-- **Backend:** Python + Flask with `routes` and `controllers`
-- **Frontend:** TypeScript + React with `pages` and `components`
-- **LLM:** OpenAI API for SQL transformation-level test generation
+## What is included
 
-## Workflow supported
+- **Frontend (React + Vite):** `SqlUnitTestManager` screen with procedure listing, test generation, edit dialogs, run controls, and result/baseline actions.
+- **Backend (Flask):** `/api/sqltests/*` endpoints for procedures, OpenAI generation, test CRUD, execution harness, run history, and baseline acceptance.
+- **Persistence:** SQL Server migration for `sql_test_cases`, `sql_test_runs`, and `sql_test_baselines`.
+- **OpenAI:** Responses API structured output schema for strict test JSON generation.
 
-1. Read a procedure from DB metadata (`ProcedureRepository` adapter).
-2. Send SQL procedure text to OpenAI and generate tests for each transformation (`CTE`, `JOIN`, `UNION`, `FILTER`, `AGGREGATION`).
-3. Return each test with:
-   - transformation SQL
-   - dummy input rows
-   - expected output rows
-4. Show a **Test Review Dashboard** where users can mark test results as `passed` or `failed`.
-
-## Project structure
-
-```text
-backend/
-  app.py
-  controllers/
-  routes/
-  repositories/
-  services/
-  models/
-frontend/
-  src/
-    components/
-    pages/
-    services/
-```
-
-## Run backend
+## Backend setup
 
 ```bash
 cd backend
@@ -43,14 +19,13 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Optional env vars:
+Environment variables:
 
-- `OPENAI_API_KEY`
-- `OPENAI_MODEL` (default: `gpt-4o-mini`)
+- `SQLSERVER_CONNECTION_STRING` (required for metadata queries + harness execution)
+- `OPENAI_API_KEY` (optional; fallback generator used when omitted)
+- `OPENAI_MODEL` (optional; default `gpt-4o-mini`)
 
-If API key is missing, a fallback deterministic test set is returned.
-
-## Run frontend
+## Frontend setup
 
 ```bash
 cd frontend
@@ -58,8 +33,26 @@ npm install
 npm run dev
 ```
 
-## Suggested DB integration points
+Optional env var:
 
-- Replace `ProcedureRepository.get_procedure_sql` with a query against your procedure catalog.
-- Persist pass/fail status in `update_test_status` (currently stubbed).
-- Add a run-execution endpoint to execute generated transformation SQL in an isolated test DB/schema.
+- `VITE_API_BASE_URL` (default `http://localhost:5000`)
+
+## Migration
+
+Run SQL script:
+
+- `backend/migrations/20260213_add_sql_unit_test_tables.sql`
+
+## API summary
+
+- `GET /api/sqltests/procedures`
+- `POST /api/sqltests/generate`
+- `GET /api/sqltests?proc_full_name=...`
+- `PUT /api/sqltests/:id`
+- `POST /api/sqltests/run`
+- `POST /api/sqltests/:id/accept-baseline`
+- `GET /api/sqltests/runs?test_case_id=...`
+
+## Example generated JSON
+
+- `backend/examples/sample_generated_test_case.json`
