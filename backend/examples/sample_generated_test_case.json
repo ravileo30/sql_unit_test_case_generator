@@ -1,0 +1,18 @@
+{
+  "tests": [
+    {
+      "name": "returns rows for active customer",
+      "description": "Happy path using a valid customer id",
+      "params": {
+        "CustomerId": 1001
+      },
+      "setup_sql": "INSERT INTO dbo.Customers(CustomerId, IsActive) VALUES (1001, 1);",
+      "act_sql": "EXEC dbo.usp_GetCustomerLedger @CustomerId = 1001",
+      "actual_schema_sql": "CREATE TABLE #Actual (LedgerDate DATE, Amount DECIMAL(18,2), EntryType NVARCHAR(50));",
+      "expected_schema_sql": "CREATE TABLE #Expected (LedgerDate DATE, Amount DECIMAL(18,2), EntryType NVARCHAR(50));",
+      "openjson_with_clause": "LedgerDate DATE '$.LedgerDate', Amount DECIMAL(18,2) '$.Amount', EntryType NVARCHAR(50) '$.EntryType'",
+      "assertion_type": "EXCEPT_FULL_COMPARE",
+      "assert_sql": ""
+    }
+  ]
+}
